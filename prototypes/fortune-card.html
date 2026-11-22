@@ -68,56 +68,43 @@
   .chip[aria-pressed="true"] span { color: rgba(255,255,255,.6); }
   .note { margin-top: 24px; padding: 12px 14px; border-radius: 12px; background: var(--field); font-size: 13px; color: var(--ink-2); line-height: 1.55; text-wrap: pretty; }
 
-  /* ── 카드 화면 ── */
-  .topbar { flex: none; height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px 0 20px; color: #fff; }
-  .topdate { font-family: var(--mono); font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 8px; }
-  .badge { font-family: "Noto Sans KR", sans-serif; font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 99px; background: rgba(255,255,255,.16); opacity: 0; transition: opacity 200ms ease-out; }
-  .badge.show { opacity: 1; }
-  .ghost { height: 44px; padding: 0 12px; border-radius: 12px; font-size: 14px; font-weight: 700; color: #fff; }
-  .ghost:active { background: rgba(255,255,255,.1); }
-
-  .carousel { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
-  .track { height: 100%; display: flex; gap: 10px; padding: 0 24px; will-change: transform; }
+  /* ── 스토리형 카드 화면 ── */
+  .story-wrap { flex: 1 1 auto; min-height: 0; padding: 16px; display: flex; }
+  .story { position: relative; flex: 1; border-radius: 24px; overflow: hidden; background: #1a1a1f; touch-action: pan-y; user-select: none; -webkit-user-select: none; isolation: isolate; }
+  .track { position: absolute; inset: 0; display: flex; will-change: transform; }
   .track.anim { transition: transform 320ms cubic-bezier(.2,.8,.2,1); }
-  .slide { flex: 0 0 100%; height: 100%; }
+  .slide { flex: 0 0 100%; height: 100%; position: relative; }
+  .bars { position: absolute; z-index: 5; left: 14px; right: 14px; top: 14px; display: flex; gap: 4px; pointer-events: none; }
+  .bars i { flex: 1; height: 3px; border-radius: 3px; background: rgba(255,255,255,.35); transition: background-color 200ms ease-out; }
+  .bars i.on { background: #fff; }
+  .story-head { position: absolute; z-index: 5; left: 18px; right: 8px; top: 22px; height: 48px; display: flex; align-items: center; justify-content: space-between; color: #fff; pointer-events: none; text-shadow: 0 1px 6px rgba(0,0,0,.2); }
+  .story-head .lbl { font-size: 14px; font-weight: 700; }
+  .story-head .lbl b { font-family: var(--mono); font-weight: 600; }
+  .glass { pointer-events: auto; height: 44px; padding: 0 12px; border-radius: 12px; background: rgba(255,255,255,.18); color: #fff; font-size: 14px; font-weight: 700; }
+  .story-foot { position: absolute; z-index: 5; left: 16px; right: 16px; bottom: 16px; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+  .story-foot .primary { pointer-events: auto; background: #fff; color: var(--ink); }
+  .hint { text-align: center; font-size: 12px; color: rgba(255,255,255,.85); min-height: 16px; }
 
-  .dots { flex: none; display: flex; justify-content: center; gap: 4px; padding-top: 6px; }
-  .dot { width: 44px; height: 28px; display: grid; place-items: center; }
-  .dot i { width: 6px; height: 6px; border-radius: 99px; background: rgba(255,255,255,.3); transition: width 200ms ease-out, background-color 200ms ease-out; }
-  .dot[aria-current="true"] i { width: 18px; background: #fff; }
-  .dot-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-
-  /* 카드 */
-  .card { height: 100%; background: var(--paper); border-radius: 8px; padding: 12px 12px 10px; display: flex; flex-direction: column; overflow: hidden; }
-  .c-head { flex: none; display: flex; justify-content: space-between; font-family: var(--mono); font-size: 12px; font-weight: 600; height: 18px; align-items: center; font-variant-numeric: tabular-nums; }
-  .art-box { flex: 1 1 auto; min-height: 0; margin-top: 8px; display: flex; justify-content: center; align-items: flex-start; }
-  .art { position: relative; border-radius: 4px; overflow: hidden; background: #e9e9ec; }
-  .art::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(0,0,0,.06); pointer-events: none; z-index: 3; }
+  /* 카드 (스토리 한 장) */
+  .card { position: absolute; inset: 0; color: #fff; }
+  .art { position: absolute; inset: 0; background: #2a2a30; }
   .art canvas, .art svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   .orn { pointer-events: none; }
   .orn path, .orn rect, .orn circle, .orn ellipse { fill: none; stroke: #fff; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
   .orn .fill { fill: #fff; stroke: none; }
   .orn .dim { opacity: .7; }
-  .c-meta { flex: none; display: flex; justify-content: space-between; margin-top: 8px; font-size: 12.5px; font-weight: 500; }
-  .c-meta span:last-child { font-family: var(--mono); font-size: 12px; }
-  .c-title { flex: none; margin: 8px 0 8px; font-size: 24px; font-weight: 900; line-height: 1.22; letter-spacing: -.045em; word-break: keep-all; text-wrap: balance; }
-  .spec { flex: none; display: grid; grid-template-columns: 1fr 1fr; font-size: 12.5px; line-height: 1; }
-  .spec .l { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 5px 10px 5px 0; border-bottom: 1px solid var(--rule); min-width: 0; }
-  .spec .l span:last-child { font-family: var(--mono); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
-  .spec .full { grid-column: 1 / -1; padding-right: 0; }
-  .scores { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--rule); }
-  .sc { padding: 7px 8px 8px 0; min-width: 0; }
-  .sc + .sc { padding-left: 8px; border-left: 1px solid var(--rule); }
-  .sc .lb { font-size: 11.5px; color: var(--ink-2); white-space: nowrap; }
-  .sc .v { margin-top: 3px; font-family: var(--mono); font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1; }
-  .sc .bar { margin-top: 6px; height: 2px; background: var(--rule); position: relative; }
-  .sc .bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ink); }
-  .spec .full span:last-child { font-family: "Noto Sans KR", sans-serif; font-size: 12.5px; white-space: normal; text-align: right; line-height: 1.35; }
-  .spec .warn span:first-child { color: var(--warn); }
-
-  /* 공유받은 화면 */
-  .shared-head { flex: none; padding: 14px 20px 12px; color: #fff; font-size: 16px; font-weight: 700; letter-spacing: -.02em; }
-  .shared-body { flex: 1 1 auto; min-height: 0; padding: 0 24px; }
+  .scrim { position: absolute; inset: 0; z-index: 2; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,.18) 0%, rgba(0,0,0,0) 20%, rgba(0,0,0,0) 45%, rgba(0,0,0,.4) 100%); }
+  .content { position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 78px 16px 108px; pointer-events: none; }
+  .c-pair { font-family: var(--mono); font-size: 13px; font-weight: 600; opacity: .92; text-shadow: 0 1px 6px rgba(0,0,0,.2); }
+  .c-space { flex: 1 1 auto; min-height: 60px; width: 100%; }
+  .c-key { font-size: clamp(72px, 28vw, 116px); font-weight: 900; letter-spacing: -.06em; line-height: .95; text-shadow: 0 2px 28px rgba(20,10,60,.3); }
+  @media (max-height: 720px) { .c-key { font-size: 76px; } }
+  .c-title { margin: 12px 0 0; padding: 0 8px; font-size: 21px; font-weight: 700; letter-spacing: -.03em; line-height: 1.3; text-wrap: balance; word-break: keep-all; text-shadow: 0 1px 10px rgba(0,0,0,.2); }
+  .tiles { margin-top: 16px; width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .tile { padding: 9px 6px; border-radius: 12px; background: rgba(10,16,20,.34); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+  .tile .lb { font-size: 12px; opacity: .88; }
+  .tile .v { margin-top: 2px; font-size: 14.5px; font-weight: 700; line-height: 1.3; word-break: keep-all; }
+  .tile .v.num { font-family: var(--mono); font-size: 18px; font-weight: 600; }
 
   /* 시트 · 모달 · 토스트 */
   .dim-bg { position: absolute; inset: 0; z-index: 20; background: rgba(0,0,0,.45); opacity: 0; pointer-events: none; transition: opacity 250ms ease-out; }
@@ -155,30 +142,24 @@
     <div class="bottom"><button class="primary" id="startBtn" disabled>오늘의 기운 보기</button></div>
   </section>
 
-  <!-- 2. 운세 카드 화면 -->
-  <section class="screen on-dark" id="sCards">
-    <div class="topbar">
-      <div class="topdate"><span id="topDate">11.22 SUN</span><span class="badge" id="yBadge">어제</span></div>
-      <button class="ghost" id="infoBtn">내 정보</button>
-    </div>
-    <div class="carousel" id="carousel">
-      <div class="track" id="track">
-        <div class="slide" id="slide0"></div>
-        <div class="slide" id="slide1"></div>
-      </div>
-    </div>
-    <div class="dots" role="tablist">
-      <button class="dot" id="dot0" aria-label="어제 카드"><i></i></button>
-      <button class="dot" id="dot1" aria-label="오늘 카드"><i></i></button>
-    </div>
-    <div class="bottom"><button class="primary" id="shareBtn">친구에게 보내기</button></div>
+  <!-- 2. 운세 카드 화면 (스토리형) -->
+  <section class="screen" id="sCards">
+    <div class="story-wrap"><div class="story" id="story">
+      <div class="track" id="track"><div class="slide" id="slide0"></div><div class="slide" id="slide1"></div></div>
+      <div class="bars"><i id="bar0"></i><i id="bar1"></i></div>
+      <div class="story-head"><span class="lbl" id="topDate">오늘 · <b>11.22 SUN</b></span><button class="glass" id="infoBtn">내 정보</button></div>
+      <div class="story-foot"><button class="primary" id="shareBtn">친구에게 보내기</button><div class="hint" id="hint" aria-live="polite"></div></div>
+    </div></div>
   </section>
 
   <!-- 3. 공유받은 화면 -->
-  <section class="screen on-dark" id="sShared">
-    <div class="shared-head" id="sharedHead">친구의 11월 22일 기운이에요</div>
-    <div class="shared-body" id="sharedSlide"></div>
-    <div class="bottom"><button class="primary" id="mineBtn">내 오늘 운세 보기</button></div>
+  <section class="screen" id="sShared">
+    <div class="story-wrap"><div class="story">
+      <div class="track"><div class="slide" id="sharedSlide"></div></div>
+      <div class="bars"><i class="on"></i></div>
+      <div class="story-head"><span class="lbl" id="sharedHead">친구의 11월 22일 기운이에요</span></div>
+      <div class="story-foot"><button class="primary" id="mineBtn">내 오늘 운세 보기</button><div class="hint">친구가 보낸 카드예요</div></div>
+    </div></div>
   </section>
 
   <!-- 내 정보 시트 -->
@@ -466,7 +447,7 @@ function iconMaterial(el, holoEnv) {
 
 class CardArt {
   constructor(el) {
-    this.el = el; this.live = false; this.mesh = null; this.pop = 1; this.base = 1; this.dayEl = -1; this.W = 1; this.H = 1;
+    this.el = el; this.live = false; this.mesh = null; this.pop = 1; this.base = 1; this.dayEl = -1; this.W = 1; this.H = 1; this.iconY = 0;
     el.innerHTML = '<canvas></canvas><svg class="orn" xmlns="http://www.w3.org/2000/svg"></svg><canvas></canvas>';
     const [gc, svg, ic] = el.children; this.svg = svg;
 
@@ -516,14 +497,15 @@ class CardArt {
     this.scene.add(this.mesh); this.pop = 0; this.dayEl = card.dayEl;
     this.svg.innerHTML = ornament(card.dayEl, this.W, this.H);
   }
-  resize(w, h) {
+  // cy: 아이콘 중심의 세로 위치(0~1), sizePx: 아이콘 크기(px)
+  resize(w, h, cy = 0.5, sizePx = null) {
     this.W = w; this.H = h;
-    this.el.style.width = w + 'px'; this.el.style.height = h + 'px';
     this.gr.setSize(w, h, false); this.ir.setSize(w, h, false);
     this.U.uRes.value.set(w * DPR, h * DPR);
     this.cam.aspect = w / h; this.cam.updateProjectionMatrix();
     const visH = 2 * this.cam.position.z * Math.tan(THREE.MathUtils.degToRad(this.cam.fov / 2));
-    this.base = Math.min(visH * this.cam.aspect, visH) * 0.26;
+    this.iconY = (0.5 - cy) * visH;
+    this.base = (sizePx ?? Math.min(w, h) * 0.4) * (visH / h) / 2;
     this.svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
     if (this.dayEl >= 0) this.svg.innerHTML = ornament(this.dayEl, w, h);
     this.draw(0, 0);
@@ -536,7 +518,7 @@ class CardArt {
       if (dt === 0 && !this.live) this.pop = 1;
       this.mesh.rotation.y += 0.45 * dt;
       this.mesh.rotation.x = Math.sin(t * 0.7) * 0.12;
-      this.mesh.position.y = Math.sin(t * 1.1) * 0.06;
+      this.mesh.position.y = this.iconY + Math.sin(t * 1.1) * 0.06;
       const c = 1.9, x = this.pop - 1;
       this.mesh.scale.setScalar(this.base * this.mesh.userData.k * (1 + (c + 1) * x ** 3 + c * x ** 2));
     }
@@ -548,36 +530,38 @@ class CardArt {
   }
 }
 
-/* ───────────── 카드 DOM ───────────── */
+/* ───────────── 카드 DOM (스토리 한 장) ───────────── */
 function cardEl() {
   const el = document.createElement('article');
   el.className = 'card';
   el.innerHTML = `
-    <div class="c-head"><span class="c-year"></span><span class="c-no"></span></div>
-    <div class="art-box"><div class="art"></div></div>
-    <div class="c-meta"><span class="c-rel"></span><span class="c-me"></span></div>
-    <h2 class="c-title"></h2>
-    <div class="spec"></div>`;
+    <div class="art"></div><div class="scrim"></div>
+    <div class="content">
+      <span class="c-pair"></span>
+      <div class="c-space"></div>
+      <div class="c-key"></div>
+      <h2 class="c-title"></h2>
+      <div class="tiles"></div>
+    </div>`;
   return el;
 }
 function fillCard(el, card) {
   const q = s => el.querySelector(s);
-  q('.c-year').textContent = card.y;
-  q('.c-no').textContent = `No.${pad(card.day.idx + 1)} · ${STEMS_HJ[card.day.stem]}${BR_HJ[card.day.branch]}`;
-  q('.c-rel').textContent = `${card.R.name} / ${card.R.key}`;
-  q('.c-me').textContent = `일간 ${STEMS_HJ[card.myStem]}${EL[card.myEl].hj}`;
+  q('.c-pair').textContent = `${STEMS_HJ[card.day.stem]}${EL[card.dayEl].hj} × ${STEMS_HJ[card.myStem]}${EL[card.myEl].hj} · ${card.R.name}`;
+  q('.c-key').textContent = card.R.name.replace(/의 날$/, '');
   q('.c-title').textContent = card.R.lines[card.line];
-  q('.spec').innerHTML = `<div class="scores">${SCORE_LABELS.map((lb, k) => `<div class="sc"><div class="lb">${lb}</div><div class="v">${card.scores[k]}</div><div class="bar"><i style="width:${card.scores[k]}%"></i></div></div>`).join('')}</div>` +
-    `<div class="l full"><span>길한 것</span><span>${card.lucky.item}</span></div>` +
-    `<div class="l full warn"><span>조심할 것</span><span>${card.R.caution[card.caution]}</span></div>`;
+  q('.tiles').innerHTML =
+    `<div class="tile"><div class="lb">총운</div><div class="v num">${card.scores[0]}</div></div>` +
+    `<div class="tile"><div class="lb">힘이 되는</div><div class="v">${card.lucky.item.split(',')[0]}</div></div>` +
+    `<div class="tile"><div class="lb">조심할</div><div class="v">${card.R.caution[card.caution]}</div></div>`;
 }
-// 남는 공간 안에서 그래픽을 4:5 비율로 맞춘다
+// 카드 전체에 그래픽을 깔고, 아이콘은 키워드 위 빈 영역 가운데에 놓는다
 function fitArt(el, art) {
-  const box = el.querySelector('.art-box');
-  const bw = box.clientWidth, bh = box.clientHeight;
-  if (!bw || !bh) return;
-  const h = Math.floor(Math.min(bh, bw * 1.25)), w = Math.floor(h * 0.8);
-  art.resize(w, h);
+  const w = el.clientWidth, h = el.clientHeight;
+  if (!w || !h) return;
+  const r = el.getBoundingClientRect(), sp = el.querySelector('.c-space').getBoundingClientRect();
+  const cy = (sp.top - r.top + sp.height / 2) / h;
+  art.resize(w, h, cy, Math.min(w * 0.42, sp.height * 0.85));
 }
 
 /* ───────────── 상태 · 저장 ───────────── */
@@ -645,7 +629,7 @@ function openStart() {
   show('sStart');
 }
 
-// 2. 카드 화면
+// 2. 카드 화면 (스토리형: 어제 · 오늘)
 let idx = 1, cards = [], slides = [];
 function openCards() {
   disposeArts();
@@ -664,40 +648,49 @@ function openCards() {
   go(1, false);
 }
 function layoutCards() { slides.forEach(s => fitArt(s.el, s.art)); }
-function go(i, anim = true) {
+function go(i, anim = true, off = 0) {
   idx = clamp(i, 0, 1);
-  const track = $('track'), slideW = $('slide0').offsetWidth;
+  const track = $('track');
   track.classList.toggle('anim', anim);
-  track.style.transform = `translateX(${-idx * (slideW + 10)}px)`;
+  track.style.transform = `translateX(calc(${-idx * 100}% + ${off}px))`;
+  if (off) return;
   slides.forEach((s, k) => { s.art.live = k === idx; if (k !== idx) s.art.draw(clock.elapsedTime * speed, 0); });
   const c = cards[idx];
-  $('topDate').textContent = `${pad(c.m)}.${pad(c.d)} ${DOW[new Date(c.y, c.m - 1, c.d).getDay()]}`;
-  $('yBadge').classList.toggle('show', idx === 0);
-  [0, 1].forEach(k => $('dot' + k).setAttribute('aria-current', String(k === idx)));
+  $('topDate').innerHTML = `${idx === 1 ? '오늘' : '어제'} · <b>${pad(c.m)}.${pad(c.d)} ${DOW[new Date(c.y, c.m - 1, c.d).getDay()]}</b>`;
+  $('bar0').className = 'on';
+  $('bar1').className = idx === 1 ? 'on' : '';
+  $('hint').textContent = idx === 1 ? '오른쪽으로 밀거나 왼쪽을 누르면 어제 카드' : '왼쪽으로 밀거나 오른쪽을 누르면 오늘 카드';
 }
-$('dot0').onclick = () => go(0); $('dot1').onclick = () => go(1);
 
-// 스와이프
+// 넘기기: 좌우로 밀기 + 왼쪽/오른쪽 3분의 1 탭
 (() => {
-  const car = $('carousel'), track = $('track');
-  let sx = 0, sy = 0, dx = 0, dragging = false, locked = null;
-  car.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; dx = 0; dragging = true; locked = null; track.classList.remove('anim'); });
-  car.addEventListener('pointermove', e => {
-    if (!dragging) return;
+  const story = $('story');
+  let sx = 0, sy = 0, dx = 0, active = false, locked = null;
+  story.addEventListener('pointerdown', e => {
+    if (e.target.closest('button')) return;
+    sx = e.clientX; sy = e.clientY; dx = 0; active = true; locked = null;
+  });
+  story.addEventListener('pointermove', e => {
+    if (!active) return;
     const mx = e.clientX - sx, my = e.clientY - sy;
-    if (locked === null && Math.abs(mx) + Math.abs(my) > 8) { locked = Math.abs(mx) > Math.abs(my) ? 'x' : 'y'; if (locked === 'x') car.setPointerCapture(e.pointerId); }
+    if (locked === null && Math.abs(mx) + Math.abs(my) > 8) {
+      locked = Math.abs(mx) > Math.abs(my) ? 'x' : 'y';
+      if (locked === 'x') story.setPointerCapture(e.pointerId);
+    }
     if (locked !== 'x') return;
     dx = mx;
     const atEdge = (idx === 1 && dx < 0) || (idx === 0 && dx > 0);
-    const off = atEdge ? dx * 0.25 : dx; // 끝에서는 살짝만 밀림
-    const slideW = $('slide0').offsetWidth;
-    track.style.transform = `translateX(${-idx * (slideW + 10) + off}px)`;
+    go(idx, false, atEdge ? dx * 0.25 : dx); // 끝에서는 살짝만 밀림
   });
-  const end = () => {
-    if (!dragging) return; dragging = false;
-    if (locked === 'x' && Math.abs(dx) > 50) go(idx + (dx > 0 ? -1 : 1)); else go(idx);
-  };
-  car.addEventListener('pointerup', end); car.addEventListener('pointercancel', end);
+  story.addEventListener('pointerup', e => {
+    if (!active) return; active = false;
+    if (locked === 'x') { go(Math.abs(dx) > 50 ? idx + (dx > 0 ? -1 : 1) : idx); return; }
+    if (locked === null) {
+      const r = story.getBoundingClientRect(), x = (e.clientX - r.left) / r.width;
+      if (x < 1 / 3) go(0); else if (x > 2 / 3) go(1);
+    }
+  });
+  story.addEventListener('pointercancel', () => { if (active) { active = false; go(idx); } });
 })();
 
 // 공유 (프로토타입: 토스 공유 대신 기기 공유 시트 또는 링크 복사)
