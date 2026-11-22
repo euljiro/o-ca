@@ -10,6 +10,7 @@
 | `docs/framing.md` | 프로젝트 프레이밍 (배경·목적·성공 기준·방향·제약) |
 | `docs/tasks.md` | 태스크 목록 |
 | `docs/appsintoss-research.md` | 앱인토스 출시 요건 조사 |
+| `docs/privacy-research.md` | 생년월일 개인정보 처리 조사 |
 
 ## 프로토타입 실행
 
