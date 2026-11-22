@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <title>오늘의 기운</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,112 +13,195 @@
     --paper: #ffffff;
     --ink: #111111;
     --ink-2: #6b6b6b;
-    --rule: #e4e4e4;
+    --ink-3: #9a9a9a;
+    --rule: #e6e6e6;
     --rule-2: #cfcfcf;
+    --field: #f4f4f5;
+    --warn: #c2410c;
     --mono: "IBM Plex Mono", "Noto Sans KR", ui-monospace, monospace;
+    --press: transform 150ms ease-out;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; }
-  body { background: var(--page); font-family: "Noto Sans KR", system-ui, sans-serif; color: var(--ink); display: grid; place-items: center; -webkit-font-smoothing: antialiased; }
-  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body { background: #000; font-family: "Noto Sans KR", system-ui, sans-serif; color: var(--ink); display: grid; place-items: center; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; transition: var(--press); }
+  button:active:not(:disabled) { transform: scale(.96); }
+  button:disabled { cursor: default; }
 
-  .phone { position: relative; width: 100%; max-width: 430px; height: 100dvh; overflow: hidden; background: var(--page); }
-  @media (min-width: 600px) { .phone { height: min(932px, 94dvh); border-radius: 44px; box-shadow: 0 30px 80px rgba(0,0,0,.5); } }
+  .phone { position: relative; width: 100%; max-width: 430px; height: 100dvh; overflow: hidden; background: var(--page); display: flex; flex-direction: column; }
+  @media (min-width: 600px) { .phone { height: min(900px, 94dvh); border-radius: 44px; box-shadow: 0 30px 80px rgba(0,0,0,.5); } }
+
+  /* 토스 내비게이션 바 자리 (목업: 실제로는 토스가 그림) */
+  .tossbar { flex: none; height: 48px; padding-top: env(safe-area-inset-top); background: #fff; display: flex; align-items: center; justify-content: space-between; padding-inline: 16px; font-size: 15px; font-weight: 700; border-bottom: 1px solid #f0f0f0; }
+  .tossbar .side { width: 64px; color: #b0b0b0; font-size: 18px; letter-spacing: 2px; }
+  .tossbar .side:last-child { text-align: right; }
+
+  .screen { position: absolute; inset: 48px 0 0 0; display: none; flex-direction: column; }
+  .screen.on { display: flex; }
+
+  /* 하단 고정 버튼 */
+  .bottom { flex: none; padding: 8px 16px calc(env(safe-area-inset-bottom) + 16px); }
+  .primary { width: 100%; height: 52px; border-radius: 14px; background: var(--ink); color: #fff; font-weight: 700; font-size: 16px; }
+  .primary:disabled { background: #d4d4d8; color: #fff; }
+  .on-dark .primary { background: #fff; color: var(--ink); }
+  .on-dark .primary:disabled { background: #3a3a3f; color: #77777d; }
+
+  /* ── 시작 화면 · 내 정보 폼 ── */
+  .light { background: #fff; }
+  .scroll { flex: 1 1 auto; overflow-y: auto; padding: 28px 20px 12px; }
+  .h1 { font-size: 24px; font-weight: 900; letter-spacing: -.035em; line-height: 1.3; text-wrap: balance; }
+  .sub { margin-top: 8px; font-size: 15px; color: var(--ink-2); line-height: 1.5; text-wrap: pretty; }
+  .field { margin-top: 28px; }
+  .label { font-size: 14px; font-weight: 700; display: flex; align-items: baseline; gap: 6px; }
+  .label small { font-size: 13px; color: var(--ink-3); font-weight: 500; }
+  .date { margin-top: 10px; width: 100%; height: 52px; border-radius: 12px; border: 1px solid transparent; background: var(--field); padding: 0 14px; font: inherit; font-size: 16px; color: var(--ink); }
+  .date:focus { outline: none; border-color: var(--ink); background: #fff; }
+  .ilgan { margin-top: 8px; font-size: 14px; color: var(--ink-2); min-height: 20px; }
+  .ilgan b { color: var(--ink); font-weight: 900; }
+  .hours { margin-top: 10px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .chip { min-height: 48px; border-radius: 12px; background: var(--field); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; transition: var(--press), background-color 150ms ease-out, color 150ms ease-out; }
+  .chip b { font-size: 14px; font-weight: 700; }
+  .chip span { font-family: var(--mono); font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .chip.unknown { grid-column: 1 / -1; flex-direction: row; }
+  .chip[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  .chip[aria-pressed="true"] span { color: rgba(255,255,255,.6); }
+  .note { margin-top: 24px; padding: 12px 14px; border-radius: 12px; background: var(--field); font-size: 13px; color: var(--ink-2); line-height: 1.55; text-wrap: pretty; }
+
+  /* ── 카드 화면 ── */
+  .topbar { flex: none; height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px 0 20px; color: #fff; }
+  .topdate { font-family: var(--mono); font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 8px; }
+  .badge { font-family: "Noto Sans KR", sans-serif; font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 99px; background: rgba(255,255,255,.16); opacity: 0; transition: opacity 200ms ease-out; }
+  .badge.show { opacity: 1; }
+  .ghost { height: 44px; padding: 0 12px; border-radius: 12px; font-size: 14px; font-weight: 700; color: #fff; }
+  .ghost:active { background: rgba(255,255,255,.1); }
+
+  .carousel { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+  .track { height: 100%; display: flex; gap: 10px; padding: 0 24px; will-change: transform; }
+  .track.anim { transition: transform 320ms cubic-bezier(.2,.8,.2,1); }
+  .slide { flex: 0 0 100%; height: 100%; }
+
+  .dots { flex: none; display: flex; justify-content: center; gap: 4px; padding-top: 6px; }
+  .dot { width: 44px; height: 28px; display: grid; place-items: center; }
+  .dot i { width: 6px; height: 6px; border-radius: 99px; background: rgba(255,255,255,.3); transition: width 200ms ease-out, background-color 200ms ease-out; }
+  .dot[aria-current="true"] i { width: 18px; background: #fff; }
+  .dot-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
   /* 카드 */
-  .card {
-    position: absolute;
-    top: calc(env(safe-area-inset-top) + 14px); bottom: calc(env(safe-area-inset-bottom) + 14px);
-    left: 14px; right: 14px;
-    background: var(--paper); border-radius: 6px;
-    padding: 12px 14px 14px;
-    display: flex; flex-direction: column;
-  }
-  @media (min-width: 600px) { .card { top: 30px; bottom: 30px; left: 20px; right: 20px; } }
-
-  .topline { display: flex; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 11px; font-weight: 600; height: 26px; }
-  .nav { display: flex; align-items: center; gap: 2px; }
-  .nav button { height: 26px; min-width: 26px; display: grid; place-items: center; border-radius: 4px; }
-  .nav button:active { background: #f0f0f0; }
-  .nav svg { width: 14px; height: 14px; }
-  .nav .me-btn { margin-left: 6px; padding: 0 8px; border: 1px solid var(--ink); font-weight: 600; }
-
-  /* 이미지 영역 */
-  .art { position: relative; flex: 1 1 auto; min-height: 220px; margin-top: 6px; border-radius: 14px; overflow: hidden; background: #ddd; }
+  .card { height: 100%; background: var(--paper); border-radius: 8px; padding: 12px 12px 10px; display: flex; flex-direction: column; overflow: hidden; }
+  .c-head { flex: none; display: flex; justify-content: space-between; font-family: var(--mono); font-size: 12px; font-weight: 600; height: 18px; align-items: center; font-variant-numeric: tabular-nums; }
+  .art-box { flex: 1 1 auto; min-height: 0; margin-top: 8px; display: flex; justify-content: center; align-items: flex-start; }
+  .art { position: relative; border-radius: 4px; overflow: hidden; background: #e9e9ec; }
+  .art::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(0,0,0,.06); pointer-events: none; z-index: 3; }
   .art canvas, .art svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-  #icon { touch-action: none; }
   .orn { pointer-events: none; }
   .orn path, .orn rect, .orn circle, .orn ellipse { fill: none; stroke: #fff; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
   .orn .fill { fill: #fff; stroke: none; }
   .orn .dim { opacity: .7; }
-
-  .meta { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; font-weight: 500; margin-top: 7px; color: var(--ink); }
-
-  .content { transition: opacity .3s, transform .3s; }
-  .swap .content { opacity: 0; transform: translateY(4px); }
-  .title { margin: 12px 0 10px; font-size: 26px; font-weight: 900; line-height: 1.2; letter-spacing: -.045em; word-break: keep-all; }
-
-  /* 스펙 표 */
-  .spec { display: grid; grid-template-columns: 1fr 1fr; font-family: var(--mono); font-size: 11px; line-height: 1; }
+  .c-meta { flex: none; display: flex; justify-content: space-between; margin-top: 8px; font-size: 12.5px; font-weight: 500; }
+  .c-meta span:last-child { font-family: var(--mono); font-size: 12px; }
+  .c-title { flex: none; margin: 8px 0 8px; font-size: 24px; font-weight: 900; line-height: 1.22; letter-spacing: -.045em; word-break: keep-all; text-wrap: balance; }
+  .spec { flex: none; display: grid; grid-template-columns: 1fr 1fr; font-size: 12.5px; line-height: 1; }
   .spec .l { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 5px 10px 5px 0; border-bottom: 1px solid var(--rule); min-width: 0; }
-  .spec .l span:last-child { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px; }
-  .spec .r { position: relative; border-left: 1px solid var(--rule-2); }
-  .spec .r .track { position: absolute; left: 10px; right: 0; top: 50%; height: 1px; background: var(--rule-2); }
-  .spec .r .mk { position: absolute; top: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px; background: var(--ink); transition: left .6s cubic-bezier(.2,.8,.2,1); }
+  .spec .l span:last-child { font-family: var(--mono); font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
   .spec .full { grid-column: 1 / -1; padding-right: 0; }
-  .spec .full span:last-child { white-space: normal; text-align: right; line-height: 1.35; }
-  .sw { width: 9px; height: 9px; display: inline-block; flex: none; }
-  .warn span:first-child { color: #d9480f; }
+  .scores { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--rule); }
+  .sc { padding: 7px 8px 8px 0; min-width: 0; }
+  .sc + .sc { padding-left: 8px; border-left: 1px solid var(--rule); }
+  .sc .lb { font-size: 11.5px; color: var(--ink-2); white-space: nowrap; }
+  .sc .v { margin-top: 3px; font-family: var(--mono); font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1; }
+  .sc .bar { margin-top: 6px; height: 2px; background: var(--rule); position: relative; }
+  .sc .bar i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ink); }
+  .spec .full span:last-child { font-family: "Noto Sans KR", sans-serif; font-size: 12.5px; white-space: normal; text-align: right; line-height: 1.35; }
+  .spec .warn span:first-child { color: var(--warn); }
 
-  /* 설정 시트 */
-  .sheet-bg { position: absolute; inset: 0; z-index: 5; background: rgba(0,0,0,.45); opacity: 0; pointer-events: none; transition: opacity .3s; }
-  .sheet { position: absolute; z-index: 6; left: 0; right: 0; bottom: 0; background: #fff; border-radius: 22px 22px 0 0; padding: 12px 20px calc(env(safe-area-inset-bottom) + 20px); transform: translateY(105%); transition: transform .4s cubic-bezier(.2,.8,.2,1); }
-  .open .sheet-bg { opacity: 1; pointer-events: auto; }
-  .open .sheet { transform: none; }
-  .grab { width: 36px; height: 4px; border-radius: 4px; background: #ddd; margin: 0 auto 16px; }
-  .sheet h2 { font-size: 20px; font-weight: 900; letter-spacing: -.03em; }
-  .sheet p { font-size: 13.5px; color: var(--ink-2); margin-top: 6px; line-height: 1.5; }
-  .sheet input { margin-top: 16px; width: 100%; height: 50px; border-radius: 10px; border: 1px solid #ddd; padding: 0 14px; font: inherit; font-size: 16px; background: #f7f7f7; color: var(--ink); }
-  .me { margin-top: 12px; padding: 12px 14px; border-radius: 10px; background: #f7f7f7; font-size: 14px; }
-  .me b { font-weight: 900; }
-  .primary { margin-top: 16px; width: 100%; height: 50px; border-radius: 10px; background: var(--ink); color: #fff; font-weight: 700; font-size: 16px; }
+  /* 공유받은 화면 */
+  .shared-head { flex: none; padding: 14px 20px 12px; color: #fff; font-size: 16px; font-weight: 700; letter-spacing: -.02em; }
+  .shared-body { flex: 1 1 auto; min-height: 0; padding: 0 24px; }
+
+  /* 시트 · 모달 · 토스트 */
+  .dim-bg { position: absolute; inset: 0; z-index: 20; background: rgba(0,0,0,.45); opacity: 0; pointer-events: none; transition: opacity 250ms ease-out; }
+  .dim-bg.on { opacity: 1; pointer-events: auto; }
+  .sheet { position: absolute; z-index: 21; left: 0; right: 0; bottom: 0; max-height: 88%; background: #fff; border-radius: 22px 22px 0 0; display: flex; flex-direction: column; transform: translateY(105%); transition: transform 350ms cubic-bezier(.2,.8,.2,1); }
+  .sheet.on { transform: none; }
+  .grab { flex: none; width: 36px; height: 4px; border-radius: 4px; background: #ddd; margin: 10px auto 0; }
+  .sheet .scroll { padding-top: 18px; }
+  .textbtn { display: block; margin: 14px auto 0; height: 44px; padding: 0 12px; font-size: 14px; color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; }
+  .modal { position: absolute; z-index: 31; left: 24px; right: 24px; top: 50%; background: #fff; border-radius: 20px; padding: 24px 20px 16px; transform: translateY(-46%) scale(.98); opacity: 0; pointer-events: none; transition: opacity 200ms ease-out, transform 200ms ease-out; }
+  .modal.on { opacity: 1; transform: translateY(-50%); pointer-events: auto; }
+  .modal h3 { font-size: 18px; font-weight: 900; letter-spacing: -.02em; }
+  .modal p { margin-top: 8px; font-size: 14.5px; color: var(--ink-2); line-height: 1.5; }
+  .modal .row { margin-top: 20px; display: flex; gap: 8px; }
+  .modal .row button { flex: 1; height: 48px; border-radius: 12px; font-weight: 700; }
+  .modal .cancel { background: var(--field); }
+  .modal .danger { background: var(--ink); color: #fff; }
+  .modal-bg { z-index: 30; }
+  .toast { position: absolute; z-index: 40; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 92px); transform: translate(-50%, 8px); background: rgba(30,30,32,.94); color: #fff; font-size: 14px; font-weight: 500; padding: 11px 16px; border-radius: 12px; opacity: 0; pointer-events: none; transition: opacity 200ms ease-out, transform 200ms ease-out; white-space: nowrap; }
+  .toast.on { opacity: 1; transform: translate(-50%, 0); }
 </style>
 </head>
 <body>
 <div class="phone" id="phone">
-  <article class="card" id="card">
-    <div class="topline">
-      <span id="year">2026</span>
-      <div class="nav">
-        <button id="prev" aria-label="전날"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
-        <span id="dDate">11.22 SUN</span>
-        <button id="next" aria-label="다음날"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
-        <button class="me-btn" id="openSheet" aria-label="생년월일 설정"><span id="meBtn">나 乙木</span></button>
+  <!-- 목업: 실제 앱에서는 토스가 내비게이션 바를 그린다 -->
+  <div class="tossbar" aria-hidden="true"><span class="side">‹</span><span>오늘의 기운</span><span class="side">⋯ ✕</span></div>
+
+  <!-- 1. 시작 화면 -->
+  <section class="screen light" id="sStart">
+    <div class="scroll">
+      <h1 class="h1">오늘의 기운을 알려드릴게요</h1>
+      <p class="sub">태어난 날로 나의 오행을 계산해요</p>
+      <div id="startForm"></div>
+    </div>
+    <div class="bottom"><button class="primary" id="startBtn" disabled>오늘의 기운 보기</button></div>
+  </section>
+
+  <!-- 2. 운세 카드 화면 -->
+  <section class="screen on-dark" id="sCards">
+    <div class="topbar">
+      <div class="topdate"><span id="topDate">11.22 SUN</span><span class="badge" id="yBadge">어제</span></div>
+      <button class="ghost" id="infoBtn">내 정보</button>
+    </div>
+    <div class="carousel" id="carousel">
+      <div class="track" id="track">
+        <div class="slide" id="slide0"></div>
+        <div class="slide" id="slide1"></div>
       </div>
     </div>
-
-    <div class="art" id="artBox">
-      <canvas id="grad"></canvas>
-      <svg class="orn" id="orn" xmlns="http://www.w3.org/2000/svg"></svg>
-      <canvas id="icon"></canvas>
+    <div class="dots" role="tablist">
+      <button class="dot" id="dot0" aria-label="어제 카드"><i></i></button>
+      <button class="dot" id="dot1" aria-label="오늘 카드"><i></i></button>
     </div>
+    <div class="bottom"><button class="primary" id="shareBtn">친구에게 보내기</button></div>
+  </section>
 
-    <div class="content">
-      <div class="meta"><span id="relTxt">단련의 날 / 관성</span><span id="dayNo">No.37 · 庚子</span></div>
-      <h1 class="title" id="headline">피드백은 선물로 받기</h1>
-      <div class="spec" id="spec"></div>
-    </div>
-  </article>
+  <!-- 3. 공유받은 화면 -->
+  <section class="screen on-dark" id="sShared">
+    <div class="shared-head" id="sharedHead">친구의 11월 22일 기운이에요</div>
+    <div class="shared-body" id="sharedSlide"></div>
+    <div class="bottom"><button class="primary" id="mineBtn">내 오늘 운세 보기</button></div>
+  </section>
 
-  <div class="sheet-bg" id="sheetBg"></div>
-  <div class="sheet" role="dialog" aria-label="생년월일 설정">
+  <!-- 내 정보 시트 -->
+  <div class="dim-bg" id="sheetBg"></div>
+  <div class="sheet" id="sheet" role="dialog" aria-label="내 정보">
     <div class="grab"></div>
-    <h2>생년월일을 알려주세요</h2>
-    <p>태어난 날로 나의 오행을 계산해요. 태어난 시간은 필요 없어요.</p>
-    <input type="date" id="birth" value="1995-03-15" min="1920-01-01" max="2026-12-31">
-    <div class="me" id="meInfo"></div>
-    <button class="primary" id="save">오늘의 기운 보기</button>
+    <div class="scroll">
+      <h2 class="h1" style="font-size:20px">내 정보</h2>
+      <div id="sheetForm"></div>
+      <button class="textbtn" id="clearBtn">내 정보 지우기</button>
+    </div>
+    <div class="bottom"><button class="primary" id="saveBtn" disabled>저장</button></div>
   </div>
+
+  <!-- 확인 모달 -->
+  <div class="dim-bg modal-bg" id="modalBg"></div>
+  <div class="modal" id="modal" role="alertdialog" aria-labelledby="mTitle">
+    <h3 id="mTitle">내 정보를 지울까요?</h3>
+    <p>이 기기에 저장된 생년월일과 태어난 시가 지워져요.</p>
+    <div class="row"><button class="cancel" id="mCancel">취소</button><button class="danger" id="mOk">지우기</button></div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
 </div>
 
 <script type="importmap">
@@ -254,25 +337,57 @@ function ornament(el, W, H) {
   return `${back}${front}`;
 }
 
-/* ───────────── 4. 그라데이션 + 3D 아이콘 ───────────── */
+
+const HOURS = [
+  ['자시', '23:30–01:29'], ['축시', '01:30–03:29'], ['인시', '03:30–05:29'], ['묘시', '05:30–07:29'],
+  ['진시', '07:30–09:29'], ['사시', '09:30–11:29'], ['오시', '11:30–13:29'], ['미시', '13:30–15:29'],
+  ['신시', '15:30–17:29'], ['유시', '17:30–19:29'], ['술시', '19:30–21:29'], ['해시', '21:30–23:29'],
+];
+const pad = n => String(n).padStart(2, '0');
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const isoToday = () => { const t = new Date(); return `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())}`; };
+
+/* ───────────── 카드 내용 · 카드 번호 ─────────────
+   내 카드: 생년월일 전체 + 날짜로 문구·점수를 고른다 (사람마다 다름)
+   카드 번호: 고른 결과만 담는다 → 받은 사람이 같은 카드를 다시 그림. 생년월일은 담지 않음 */
+function cardFor(birth, date) {
+  const [by, bm, bd] = birth.split('-').map(Number);
+  const me = dayPillar(by, bm, bd);
+  const y = date.getFullYear(), m = date.getMonth() + 1, d = date.getDate();
+  const day = dayPillar(y, m, d);
+  const R = REL[relationOf(stemEl(me.stem), stemEl(day.stem))];
+  const h = hash(`${birth}|${y}-${m}-${d}`);
+  return build({
+    y, m, d, myStem: me.stem,
+    line: h % R.lines.length,
+    caution: (h >>> 8) % R.caution.length,
+    scores: R.score.map((s, k) => clamp(s + ((h >>> (k * 5)) % 21) - 10, 18, 98)),
+  });
+}
+function encode(c) { return `${c.y}${pad(c.m)}${pad(c.d)}-${c.myStem}-${c.line}-${c.caution}-${c.scores.join('-')}`; }
+function decode(str) {
+  const m = /^(\d{4})(\d{2})(\d{2})-(\d)-(\d+)-(\d+)-(\d{1,3})-(\d{1,3})-(\d{1,3})-(\d{1,3})-(\d{1,3})$/.exec(str || '');
+  if (!m) return null;
+  const [y, mo, d, myStem, line, caution] = m.slice(1, 7).map(Number);
+  const scores = m.slice(7).map(Number);
+  const dt = new Date(y, mo - 1, d);
+  if (dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null;
+  const R = REL[relationOf(stemEl(myStem), stemEl(dayPillar(y, mo, d).stem))];
+  if (line >= R.lines.length || caution >= R.caution.length || scores.some(s => s > 100)) return null;
+  return build({ y, m: mo, d, myStem, line, caution, scores });
+}
+function build(c) {
+  const day = dayPillar(c.y, c.m, c.d);
+  const myEl = stemEl(c.myStem), dayEl = stemEl(day.stem);
+  const R = REL[relationOf(myEl, dayEl)];
+  const code = encode(c);
+  return { ...c, day, myEl, dayEl, R, lucky: EL[(myEl + R.lucky) % 5].lucky, code, seed: (hash(code) % 1000) / 100 };
+}
+
+/* ───────────── 그래픽: 그라데이션 + 라인 장식 + 3D 아이콘 ───────────── */
 const DPR = Math.min(window.devicePixelRatio || 1, 2);
 const v3 = hex => { const c = parseInt(hex.slice(1), 16); return new THREE.Vector3((c >> 16 & 255) / 255, (c >> 8 & 255) / 255, (c & 255) / 255); };
-
-// 그라데이션 (위: 오늘의 오행 / 아래: 나의 오행)
-const gradR = new THREE.WebGLRenderer({ canvas: document.getElementById('grad') });
-gradR.setPixelRatio(DPR);
-const gradScene = new THREE.Scene();
-const gradCam = new THREE.Camera();
-const GU = {
-  uTime: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) }, uDpr: { value: DPR }, uSeed: { value: 0 },
-  uA0: { value: new THREE.Vector3() }, uA1: { value: new THREE.Vector3() }, uA2: { value: new THREE.Vector3() },
-  uB0: { value: new THREE.Vector3() }, uB1: { value: new THREE.Vector3() }, uB2: { value: new THREE.Vector3() },
-};
-const grad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({
-  uniforms: GU, depthTest: false, depthWrite: false,
-  vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`,
-  fragmentShader: `
-    precision highp float;
+const FRAG = `    precision highp float;
     uniform float uTime, uDpr, uSeed; uniform vec2 uRes;
     uniform vec3 uA0, uA1, uA2, uB0, uB1, uB2;
     varying vec2 vUv;
@@ -301,35 +416,7 @@ const grad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMater
       col *= 1.0 - 0.15 * length(vUv - vec2(0.5, 0.5));
       col += (hash(gl_FragCoord.xy / uDpr + fract(uTime) * 91.7) - 0.5) * 0.11;
       gl_FragColor = vec4(col, 1.0);
-    }`,
-}));
-grad.frustumCulled = false; gradScene.add(grad);
-
-// 3D 아이콘 (투명 배경 · 장식 라인 위에 얹힘)
-const iconR = new THREE.WebGLRenderer({ canvas: document.getElementById('icon'), antialias: true, alpha: true });
-iconR.setPixelRatio(DPR);
-iconR.setClearColor(0x000000, 0);
-iconR.toneMapping = THREE.NeutralToneMapping;
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
-camera.position.set(0, 0, 9);
-const pmrem = new THREE.PMREMGenerator(iconR);
-scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(3, 4, 5); scene.add(key);
-const rim = new THREE.DirectionalLight(0xffffff, 1.2); rim.position.set(-4, -1, -3); scene.add(rim);
-
-const holoScene = new THREE.Scene();
-holoScene.add(new THREE.Mesh(new THREE.SphereGeometry(10, 64, 32), new THREE.ShaderMaterial({
-  side: THREE.BackSide,
-  vertexShader: `varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-  fragmentShader: `varying vec3 vP; void main(){
-    float a = atan(vP.z, vP.x) * 1.5 + vP.y * 3.0;
-    vec3 c = 0.62 + 0.38 * cos(6.2831 * (vec3(0.0, 0.33, 0.67) + a * 0.25));
-    c = mix(c, vec3(1.0), smoothstep(0.6, 1.0, vP.y) * 0.8);
-    c *= mix(0.35, 1.0, smoothstep(-0.8, 0.2, vP.y));
-    gl_FragColor = vec4(c, 1.0); }`,
-})));
-const holoEnv = pmrem.fromScene(holoScene, 0.02).texture;
+    }`;
 
 function normalize(geo) {
   geo.computeBoundingBox(); geo.center();
@@ -365,7 +452,9 @@ function iconGeometry(el) {
   }
   return normalize(new THREE.LatheGeometry(pts, 72));
 }
-function iconMaterial(el) {
+
+
+function iconMaterial(el, holoEnv) {
   switch (el) {
     case 0: return new THREE.MeshPhysicalMaterial({ color: 0x2fd18a, roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.08, sheen: 0.6, sheenColor: new THREE.Color(0xd4f56b) });
     case 1: return new THREE.MeshPhysicalMaterial({ color: 0xff2e93, emissive: 0xff2a6a, emissiveIntensity: 0.35, roughness: 0.18, clearcoat: 1, iridescence: 0.4, iridescenceIOR: 1.5 });
@@ -375,135 +464,306 @@ function iconMaterial(el) {
   }
 }
 
-let mesh = null, pop = 1, baseScale = 1, curEl = -1;
-const cur = { A: [], B: [] }, tgt = { A: [], B: [] };
-const art = document.getElementById('artBox');
-let W = 1, H = 1;
+class CardArt {
+  constructor(el) {
+    this.el = el; this.live = false; this.mesh = null; this.pop = 1; this.base = 1; this.dayEl = -1; this.W = 1; this.H = 1;
+    el.innerHTML = '<canvas></canvas><svg class="orn" xmlns="http://www.w3.org/2000/svg"></svg><canvas></canvas>';
+    const [gc, svg, ic] = el.children; this.svg = svg;
 
-function resize() {
-  W = art.clientWidth; H = art.clientHeight;
-  gradR.setSize(W, H, false); iconR.setSize(W, H, false);
-  GU.uRes.value.set(W * DPR, H * DPR);
-  camera.aspect = W / H; camera.updateProjectionMatrix();
-  const visH = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-  baseScale = Math.min(visH * camera.aspect, visH) * 0.25;
-  const svg = document.getElementById('orn');
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  if (curEl >= 0) svg.innerHTML = ornament(curEl, W, H);
+    this.gr = new THREE.WebGLRenderer({ canvas: gc }); this.gr.setPixelRatio(DPR);
+    this.U = {
+      uTime: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) }, uDpr: { value: DPR }, uSeed: { value: 0 },
+      uA0: { value: new THREE.Vector3() }, uA1: { value: new THREE.Vector3() }, uA2: { value: new THREE.Vector3() },
+      uB0: { value: new THREE.Vector3() }, uB1: { value: new THREE.Vector3() }, uB2: { value: new THREE.Vector3() },
+    };
+    this.gScene = new THREE.Scene(); this.gCam = new THREE.Camera();
+    const q = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({
+      uniforms: this.U, depthTest: false, depthWrite: false,
+      vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+      fragmentShader: FRAG,
+    }));
+    q.frustumCulled = false; this.gScene.add(q);
+
+    this.ir = new THREE.WebGLRenderer({ canvas: ic, antialias: true, alpha: true });
+    this.ir.setPixelRatio(DPR); this.ir.setClearColor(0, 0); this.ir.toneMapping = THREE.NeutralToneMapping;
+    this.scene = new THREE.Scene();
+    this.cam = new THREE.PerspectiveCamera(30, 1, 0.1, 100); this.cam.position.set(0, 0, 9);
+    const pmrem = new THREE.PMREMGenerator(this.ir);
+    this.scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(3, 4, 5); this.scene.add(key);
+    const rim = new THREE.DirectionalLight(0xffffff, 1.2); rim.position.set(-4, -1, -3); this.scene.add(rim);
+    const holo = new THREE.Scene();
+    holo.add(new THREE.Mesh(new THREE.SphereGeometry(10, 64, 32), new THREE.ShaderMaterial({
+      side: THREE.BackSide,
+      vertexShader: 'varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+      fragmentShader: `varying vec3 vP; void main(){
+        float a = atan(vP.z, vP.x) * 1.5 + vP.y * 3.0;
+        vec3 c = 0.62 + 0.38 * cos(6.2831 * (vec3(0.0, 0.33, 0.67) + a * 0.25));
+        c = mix(c, vec3(1.0), smoothstep(0.6, 1.0, vP.y) * 0.8);
+        c *= mix(0.35, 1.0, smoothstep(-0.8, 0.2, vP.y));
+        gl_FragColor = vec4(c, 1.0); }`,
+    })));
+    this.holoEnv = pmrem.fromScene(holo, 0.02).texture;
+  }
+  set(card) {
+    const A = EL[card.myEl].pal.map(v3), B = EL[card.dayEl].pal.map(v3);
+    [0, 1, 2].forEach(i => { this.U[`uA${i}`].value.copy(A[i]); this.U[`uB${i}`].value.copy(B[i]); });
+    this.U.uSeed.value = card.seed;
+    if (this.mesh) { this.scene.remove(this.mesh); this.mesh.geometry.dispose(); this.mesh.material.dispose(); }
+    this.mesh = new THREE.Mesh(iconGeometry(card.dayEl), iconMaterial(card.dayEl, this.holoEnv));
+    this.mesh.userData.k = card.dayEl === 2 ? 0.78 : 1;
+    this.mesh.rotation.y = card.seed; // 정지 상태에서도 카드마다 각도가 고정되게
+    this.scene.add(this.mesh); this.pop = 0; this.dayEl = card.dayEl;
+    this.svg.innerHTML = ornament(card.dayEl, this.W, this.H);
+  }
+  resize(w, h) {
+    this.W = w; this.H = h;
+    this.el.style.width = w + 'px'; this.el.style.height = h + 'px';
+    this.gr.setSize(w, h, false); this.ir.setSize(w, h, false);
+    this.U.uRes.value.set(w * DPR, h * DPR);
+    this.cam.aspect = w / h; this.cam.updateProjectionMatrix();
+    const visH = 2 * this.cam.position.z * Math.tan(THREE.MathUtils.degToRad(this.cam.fov / 2));
+    this.base = Math.min(visH * this.cam.aspect, visH) * 0.26;
+    this.svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    if (this.dayEl >= 0) this.svg.innerHTML = ornament(this.dayEl, w, h);
+    this.draw(0, 0);
+  }
+  draw(t, dt) {
+    this.U.uTime.value = t;
+    this.gr.render(this.gScene, this.gCam);
+    if (this.mesh) {
+      this.pop = Math.min(1, this.pop + dt * 1.4);
+      if (dt === 0 && !this.live) this.pop = 1;
+      this.mesh.rotation.y += 0.45 * dt;
+      this.mesh.rotation.x = Math.sin(t * 0.7) * 0.12;
+      this.mesh.position.y = Math.sin(t * 1.1) * 0.06;
+      const c = 1.9, x = this.pop - 1;
+      this.mesh.scale.setScalar(this.base * this.mesh.userData.k * (1 + (c + 1) * x ** 3 + c * x ** 2));
+    }
+    this.ir.render(this.scene, this.cam);
+  }
+  dispose() {
+    [this.gr, this.ir].forEach(r => { r.dispose(); r.forceContextLoss(); });
+    this.el.innerHTML = '';
+  }
 }
-new ResizeObserver(resize).observe(art);
 
-function setArt(myEl, dayEl, seed, instant) {
-  tgt.A = EL[myEl].pal.map(v3); tgt.B = EL[dayEl].pal.map(v3);
-  if (instant || !cur.A.length) { cur.A = tgt.A.map(v => v.clone()); cur.B = tgt.B.map(v => v.clone()); }
-  GU.uSeed.value = seed;
-  if (mesh) { scene.remove(mesh); mesh.geometry.dispose(); mesh.material.dispose(); }
-  mesh = new THREE.Mesh(iconGeometry(dayEl), iconMaterial(dayEl));
-  mesh.userData.k = dayEl === 2 ? 0.78 : 1;
-  scene.add(mesh); pop = 0;
-  curEl = dayEl;
-  document.getElementById('orn').innerHTML = ornament(dayEl, W, H);
+/* ───────────── 카드 DOM ───────────── */
+function cardEl() {
+  const el = document.createElement('article');
+  el.className = 'card';
+  el.innerHTML = `
+    <div class="c-head"><span class="c-year"></span><span class="c-no"></span></div>
+    <div class="art-box"><div class="art"></div></div>
+    <div class="c-meta"><span class="c-rel"></span><span class="c-me"></span></div>
+    <h2 class="c-title"></h2>
+    <div class="spec"></div>`;
+  return el;
+}
+function fillCard(el, card) {
+  const q = s => el.querySelector(s);
+  q('.c-year').textContent = card.y;
+  q('.c-no').textContent = `No.${pad(card.day.idx + 1)} · ${STEMS_HJ[card.day.stem]}${BR_HJ[card.day.branch]}`;
+  q('.c-rel').textContent = `${card.R.name} / ${card.R.key}`;
+  q('.c-me').textContent = `일간 ${STEMS_HJ[card.myStem]}${EL[card.myEl].hj}`;
+  q('.c-title').textContent = card.R.lines[card.line];
+  q('.spec').innerHTML = `<div class="scores">${SCORE_LABELS.map((lb, k) => `<div class="sc"><div class="lb">${lb}</div><div class="v">${card.scores[k]}</div><div class="bar"><i style="width:${card.scores[k]}%"></i></div></div>`).join('')}</div>` +
+    `<div class="l full"><span>길한 것</span><span>${card.lucky.item}</span></div>` +
+    `<div class="l full warn"><span>조심할 것</span><span>${card.R.caution[card.caution]}</span></div>`;
+}
+// 남는 공간 안에서 그래픽을 4:5 비율로 맞춘다
+function fitArt(el, art) {
+  const box = el.querySelector('.art-box');
+  const bw = box.clientWidth, bh = box.clientHeight;
+  if (!bw || !bh) return;
+  const h = Math.floor(Math.min(bh, bw * 1.25)), w = Math.floor(h * 0.8);
+  art.resize(w, h);
 }
 
-// 드래그로 회전
-let drag = null, spin = 0, tiltX = 0;
-const iconCanvas = document.getElementById('icon');
-iconCanvas.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY }; iconCanvas.setPointerCapture(e.pointerId); });
-iconCanvas.addEventListener('pointermove', e => {
-  if (!drag) return;
-  spin = (e.clientX - drag.x) * 0.012;
-  tiltX = THREE.MathUtils.clamp(tiltX + (e.clientY - drag.y) * 0.006, -0.6, 0.6);
-  drag = { x: e.clientX, y: e.clientY };
-});
-iconCanvas.addEventListener('pointerup', () => { drag = null; });
-
-/* ───────────── 5. 화면 ───────────── */
+/* ───────────── 상태 · 저장 ───────────── */
 const $ = id => document.getElementById(id);
-const phone = $('phone');
-let birth = '1995-03-15', hasBirth = false, offset = 0;
-try { const b = localStorage.getItem('fortune.birth'); if (b) { birth = b; hasBirth = true; } } catch (e) {}
+const KEY = 'oca.profile';
+const load = () => { try { const v = JSON.parse(localStorage.getItem(KEY)); return v && v.birth ? v : null; } catch (e) { return null; } };
+const store = p => { try { localStorage.setItem(KEY, JSON.stringify(p)); } catch (e) {} };
+const wipe = () => { try { localStorage.removeItem(KEY); } catch (e) {} };
+let profile = load();
+const arts = []; // 화면에 붙은 CardArt 목록 (live인 것만 매 프레임 그림)
 
-function specRow(label, value, score, cls = '') {
-  const bar = score == null ? '' : `<div class="track"></div><div class="mk" style="left:calc(10px + (100% - 10px) * ${score / 100})"></div>`;
-  return `<div class="l ${cls}"><span>${label}</span><span>${value}</span></div><div class="r">${bar}</div>`;
+/* ───────────── 입력 폼 (시작 화면 · 내 정보 시트 공용) ───────────── */
+function makeForm(root, initial, onChange) {
+  const st = { birth: initial?.birth || '', hour: initial?.hour ?? null };
+  root.innerHTML = `
+    <div class="field">
+      <div class="label">생년월일</div>
+      <input class="date" type="date" min="1920-01-01" max="${isoToday()}" aria-label="생년월일">
+      <div class="ilgan" aria-live="polite"></div>
+    </div>
+    <div class="field">
+      <div class="label">태어난 시 <small>선택</small></div>
+      <div class="hours">
+        ${HOURS.map(([n, t], i) => `<button class="chip" data-h="${i}" aria-pressed="false"><b>${n}</b><span>${t}</span></button>`).join('')}
+        <button class="chip unknown" data-h="unknown" aria-pressed="false"><b>모름</b></button>
+      </div>
+    </div>
+    <p class="note">입력한 정보는 이 기기에만 저장돼요. 서버로 보내지 않고, 만든 사람도 볼 수 없어요.</p>`;
+  const input = root.querySelector('.date'), ilgan = root.querySelector('.ilgan');
+  const valid = v => v && v >= '1920-01-01' && v <= isoToday();
+  const paint = () => {
+    input.value = st.birth;
+    if (valid(st.birth)) {
+      const [a, b, c] = st.birth.split('-').map(Number); const p = dayPillar(a, b, c); const e = stemEl(p.stem);
+      ilgan.innerHTML = `나의 일간은 <b>${STEMS_KO[p.stem]}${EL[e].ko}(${STEMS_HJ[p.stem]}${EL[e].hj})</b> · ${STEM_NATURE[p.stem]}`;
+    } else ilgan.textContent = '';
+    root.querySelectorAll('.chip').forEach(ch => ch.setAttribute('aria-pressed', String(String(st.hour) === ch.dataset.h)));
+  };
+  input.addEventListener('input', () => { st.birth = input.value; paint(); onChange(st, valid(st.birth)); });
+  root.querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', () => {
+    const v = ch.dataset.h === 'unknown' ? 'unknown' : Number(ch.dataset.h);
+    st.hour = st.hour === v ? null : v; paint(); onChange(st, valid(st.birth));
+  }));
+  paint();
+  return { state: st, valid: () => valid(st.birth), reset(p) { st.birth = p?.birth || ''; st.hour = p?.hour ?? null; paint(); } };
 }
 
-function render(instant) {
-  const [by, bm, bd] = birth.split('-').map(Number);
-  const me = dayPillar(by, bm, bd), myEl = stemEl(me.stem);
-  const now = new Date(); now.setDate(now.getDate() + offset);
-  const y = now.getFullYear(), m = now.getMonth() + 1, d = now.getDate();
-  const day = dayPillar(y, m, d), dayEl = stemEl(day.stem);
-  const rel = REL[relationOf(myEl, dayEl)];
-  const h = hash(`${birth}|${y}-${m}-${d}`);
-  const L = EL[(myEl + rel.lucky) % 5].lucky;
-  const scores = rel.score.map((s, k) => Math.max(18, Math.min(98, s + ((h >>> (k * 5)) % 21) - 10)));
+/* ───────────── 화면 전환 ───────────── */
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id));
+}
+function disposeArts() { while (arts.length) arts.pop().dispose(); }
 
-  $('year').textContent = y;
-  $('dDate').textContent = `${String(m).padStart(2, '0')}.${String(d).padStart(2, '0')} ${DOW[now.getDay()]}`;
-  $('meBtn').textContent = `나 ${STEMS_HJ[me.stem]}${EL[myEl].hj}`;
-
-  const card = $('card');
-  card.classList.add('swap');
-  setTimeout(() => {
-    $('relTxt').textContent = `${rel.name} / ${rel.key}`;
-    $('dayNo').textContent = `No.${String(day.idx + 1).padStart(2, '0')} · ${STEMS_HJ[day.stem]}${BR_HJ[day.branch]}`;
-    $('headline').textContent = rel.lines[h % rel.lines.length];
-    $('spec').innerHTML =
-      SCORE_LABELS.map((lb, k) => specRow(lb, scores[k], scores[k])).join('') +
-      `<div class="l full"><span>길한 것</span><span>${L.item}</span></div>` +
-      `<div class="l full warn"><span>조심할 것</span><span>${rel.caution[(h >>> 8) % rel.caution.length]}</span></div>`;
-    card.classList.remove('swap');
-  }, instant ? 0 : 200);
-
-  setArt(myEl, dayEl, (h % 1000) / 100, instant);
+// 1. 시작 화면
+const startForm = makeForm($('startForm'), null, (_, ok) => { $('startBtn').disabled = !ok; });
+$('startBtn').onclick = () => {
+  if (!startForm.valid()) return;
+  profile = { birth: startForm.state.birth, hour: startForm.state.hour };
+  store(profile);
+  openCards();
+};
+function openStart() {
+  disposeArts(); startForm.reset(null); $('startBtn').disabled = true;
+  history.replaceState(null, '', location.pathname);
+  show('sStart');
 }
 
-$('prev').onclick = () => { offset--; render(); };
-$('next').onclick = () => { offset++; render(); };
-function previewMe() {
-  const v = $('birth').value; if (!v) return;
-  const [a, b, c] = v.split('-').map(Number); const p = dayPillar(a, b, c); const e = stemEl(p.stem);
-  $('meInfo').innerHTML = `나의 일간은 <b>${STEMS_KO[p.stem]}${EL[e].ko}(${STEMS_HJ[p.stem]}${EL[e].hj})</b> · ${STEM_NATURE[p.stem]}`;
+// 2. 카드 화면
+let idx = 1, cards = [], slides = [];
+function openCards() {
+  disposeArts();
+  history.replaceState(null, '', location.pathname);
+  show('sCards');
+  const today = new Date(), yest = new Date(); yest.setDate(today.getDate() - 1);
+  cards = [cardFor(profile.birth, yest), cardFor(profile.birth, today)];
+  slides = [0, 1].map(i => {
+    const host = $('slide' + i); host.innerHTML = '';
+    const el = cardEl(); host.appendChild(el); fillCard(el, cards[i]);
+    const art = new CardArt(el.querySelector('.art')); arts.push(art);
+    return { el, art };
+  });
+  layoutCards();
+  slides.forEach((s, i) => s.art.set(cards[i]));
+  go(1, false);
 }
-const openSheet = () => { phone.classList.add('open'); $('birth').value = birth; previewMe(); };
-const closeSheet = () => phone.classList.remove('open');
-$('openSheet').onclick = openSheet;
-$('sheetBg').onclick = closeSheet;
-$('birth').addEventListener('input', previewMe);
-$('save').onclick = () => {
-  const v = $('birth').value; if (!v) return;
-  birth = v; try { localStorage.setItem('fortune.birth', v); } catch (e) {}
-  closeSheet(); render();
+function layoutCards() { slides.forEach(s => fitArt(s.el, s.art)); }
+function go(i, anim = true) {
+  idx = clamp(i, 0, 1);
+  const track = $('track'), slideW = $('slide0').offsetWidth;
+  track.classList.toggle('anim', anim);
+  track.style.transform = `translateX(${-idx * (slideW + 10)}px)`;
+  slides.forEach((s, k) => { s.art.live = k === idx; if (k !== idx) s.art.draw(clock.elapsedTime * speed, 0); });
+  const c = cards[idx];
+  $('topDate').textContent = `${pad(c.m)}.${pad(c.d)} ${DOW[new Date(c.y, c.m - 1, c.d).getDay()]}`;
+  $('yBadge').classList.toggle('show', idx === 0);
+  [0, 1].forEach(k => $('dot' + k).setAttribute('aria-current', String(k === idx)));
+}
+$('dot0').onclick = () => go(0); $('dot1').onclick = () => go(1);
+
+// 스와이프
+(() => {
+  const car = $('carousel'), track = $('track');
+  let sx = 0, sy = 0, dx = 0, dragging = false, locked = null;
+  car.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; dx = 0; dragging = true; locked = null; track.classList.remove('anim'); });
+  car.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const mx = e.clientX - sx, my = e.clientY - sy;
+    if (locked === null && Math.abs(mx) + Math.abs(my) > 8) { locked = Math.abs(mx) > Math.abs(my) ? 'x' : 'y'; if (locked === 'x') car.setPointerCapture(e.pointerId); }
+    if (locked !== 'x') return;
+    dx = mx;
+    const atEdge = (idx === 1 && dx < 0) || (idx === 0 && dx > 0);
+    const off = atEdge ? dx * 0.25 : dx; // 끝에서는 살짝만 밀림
+    const slideW = $('slide0').offsetWidth;
+    track.style.transform = `translateX(${-idx * (slideW + 10) + off}px)`;
+  });
+  const end = () => {
+    if (!dragging) return; dragging = false;
+    if (locked === 'x' && Math.abs(dx) > 50) go(idx + (dx > 0 ? -1 : 1)); else go(idx);
+  };
+  car.addEventListener('pointerup', end); car.addEventListener('pointercancel', end);
+})();
+
+// 공유 (프로토타입: 토스 공유 대신 기기 공유 시트 또는 링크 복사)
+$('shareBtn').onclick = async () => {
+  const c = cards[idx];
+  const url = `${location.origin}${location.pathname}?c=${c.code}`;
+  const text = `${idx === 1 ? '오늘' : '어제'} 내 기운은 '${c.R.lines[c.line]}'래요. 당신의 오늘도 확인해 보세요`;
+  try {
+    if (navigator.share) { await navigator.share({ text, url }); return; }
+    await navigator.clipboard.writeText(`${text}\n${url}`);
+    toast('공유 링크를 복사했어요');
+  } catch (e) {
+    if (e && e.name === 'AbortError') return; // 사용자가 공유 화면을 닫음
+    toast('공유하지 못했어요. 다시 시도해 주세요');
+  }
 };
 
-resize();
-render(true);
+// 3. 공유받은 화면
+function openShared(card) {
+  disposeArts(); show('sShared');
+  $('sharedHead').textContent = `친구의 ${card.m}월 ${card.d}일 기운이에요`;
+  const host = $('sharedSlide'); host.innerHTML = '';
+  const el = cardEl(); host.appendChild(el); fillCard(el, card);
+  const art = new CardArt(el.querySelector('.art')); arts.push(art);
+  slides = [{ el, art }];
+  fitArt(el, art); art.set(card); art.live = true;
+}
+$('mineBtn').onclick = () => { profile ? openCards() : openStart(); };
 
+// 내 정보 시트
+const sheetForm = makeForm($('sheetForm'), profile, st => {
+  $('saveBtn').disabled = !(sheetForm.valid() && (st.birth !== profile?.birth || st.hour !== (profile?.hour ?? null)));
+});
+const openSheet = () => { sheetForm.reset(profile); $('saveBtn').disabled = true; $('sheetBg').classList.add('on'); $('sheet').classList.add('on'); };
+const closeSheet = () => { $('sheetBg').classList.remove('on'); $('sheet').classList.remove('on'); };
+$('infoBtn').onclick = openSheet;
+$('sheetBg').onclick = closeSheet;
+$('saveBtn').onclick = () => {
+  profile = { birth: sheetForm.state.birth, hour: sheetForm.state.hour };
+  store(profile); closeSheet(); openCards(); toast('내 정보를 바꿨어요');
+};
+$('clearBtn').onclick = () => { $('modalBg').classList.add('on'); $('modal').classList.add('on'); };
+const closeModal = () => { $('modalBg').classList.remove('on'); $('modal').classList.remove('on'); };
+$('mCancel').onclick = closeModal; $('modalBg').onclick = closeModal;
+$('mOk').onclick = () => { wipe(); profile = null; closeModal(); closeSheet(); openStart(); };
+
+let toastT;
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2000); }
+
+/* ───────────── 시작 · 루프 ───────────── */
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const speed = reduce ? 0.25 : 1;
 const clock = new THREE.Clock();
-const easeBack = x => { const c = 1.9; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
-(function tick() {
-  const dt = Math.min(clock.getDelta(), 0.05);
-  const t = clock.elapsedTime * speed;
-  GU.uTime.value = t;
-  ['A', 'B'].forEach(k => cur[k].forEach((v, i) => { v.lerp(tgt[k][i], 1 - Math.pow(0.02, dt)); GU[`u${k}${i}`].value.copy(v); }));
-  gradR.render(gradScene, gradCam);
 
-  pop = Math.min(1, pop + dt * 1.4);
-  if (mesh) {
-    spin *= 0.94;
-    mesh.rotation.y += 0.45 * dt * speed + spin;
-    mesh.rotation.x += (tiltX + Math.sin(t * 0.7) * 0.12 - mesh.rotation.x) * 0.08;
-    mesh.position.y = Math.sin(t * 1.1) * 0.06;
-    mesh.scale.setScalar(baseScale * mesh.userData.k * easeBack(pop));
-  }
-  iconR.render(scene, camera);
+new ResizeObserver(() => { if (slides.length) { slides.forEach(s => fitArt(s.el, s.art)); if ($('sCards').classList.contains('on')) go(idx, false); } }).observe($('phone'));
+
+const shared = decode(new URLSearchParams(location.search).get('c'));
+if (shared) openShared(shared);
+else if (profile) openCards();
+else openStart();
+
+(function tick() {
+  const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime * speed;
+  arts.forEach(a => { if (a.live) a.draw(t, dt * speed); });
   requestAnimationFrame(tick);
 })();
-
-if (!hasBirth) setTimeout(openSheet, 600);
 </script>
 </body>
 </html>
