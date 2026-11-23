@@ -1,0 +1,79 @@
+{
+  "version": "1.0.0",
+  "created": "2026-11-23",
+  "type": "generated-raster-asset-collection",
+  "generation_tool": "built-in image_gen",
+  "runtime_api_required": false,
+  "elements": [
+    {
+      "index": 0,
+      "id": "wood",
+      "ko": "목",
+      "hanja": "木",
+      "file": "wood.png",
+      "width": 1122,
+      "height": 1402,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "alpha": true,
+      "bytes": 1477123,
+      "sha256": "8b9360dcd7cfc3231c974c1d614644fd364e5cbbc8dafeac846dbe810b53dd16"
+    },
+    {
+      "index": 1,
+      "id": "fire",
+      "ko": "화",
+      "hanja": "火",
+      "file": "fire.png",
+      "width": 1122,
+      "height": 1402,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "alpha": true,
+      "bytes": 1552167,
+      "sha256": "67ef9c65acf539da61232e43aebeaeb4aba4c9d6c59239c835d5e99494e3e7ff"
+    },
+    {
+      "index": 2,
+      "id": "earth",
+      "ko": "토",
+      "hanja": "土",
+      "file": "earth.png",
+      "width": 1122,
+      "height": 1402,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "alpha": true,
+      "bytes": 1527967,
+      "sha256": "5316d3a9d78a3e6978b8fbf869a09b426dedf80c41d21aa331bd93267514a897"
+    },
+    {
+      "index": 3,
+      "id": "metal",
+      "ko": "금",
+      "hanja": "金",
+      "file": "metal.png",
+      "width": 1122,
+      "height": 1402,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "alpha": true,
+      "bytes": 1793074,
+      "sha256": "a52cf6f31d764a4ebf73801ff3dfd8037cd08c0ed530ee18fc939fb56941df03"
+    },
+    {
+      "index": 4,
+      "id": "water",
+      "ko": "수",
+      "hanja": "水",
+      "file": "water.png",
+      "width": 1122,
+      "height": 1402,
+      "bit_depth": 8,
+      "png_color_type": 6,
+      "alpha": true,
+      "bytes": 1725073,
+      "sha256": "d4f87ca79f666ea592603e134696928bf730e48bfde973c8d54d416d15dc2861"
+    }
+  ]
+}
